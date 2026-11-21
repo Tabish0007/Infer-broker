@@ -1,0 +1,47 @@
+# Rendered by `cli/platform new-team <team> [gpu_quota]`.
+# __TEAM__ and __GPU_QUOTA__ are substituted.
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: team-quota
+  namespace: __TEAM__
+spec:
+  hard:
+    requests.cpu: "8"
+    requests.memory: 32Gi
+    limits.cpu: "16"
+    limits.memory: 64Gi
+    requests.nvidia.com/gpu: "__GPU_QUOTA__"
+    count/jobs.batch: "20"
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: team-defaults
+  namespace: __TEAM__
+spec:
+  limits:
+    - type: Container
+      default:        { cpu: 500m, memory: 512Mi }
+      defaultRequest: { cpu: 100m, memory: 128Mi }
+      max:            { nvidia.com/gpu: "4" }
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default-runner
+  namespace: __TEAM__
+---
+# Declared, NOT enforced on kind (kindnet ignores NetworkPolicy). See ADR 0006.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-ingress
+  namespace: __TEAM__
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: monitoring }

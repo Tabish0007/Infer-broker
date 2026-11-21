@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-inference
+  labels:
+    app: mock-inference
+    platform/team: __TEAM__
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: mock-inference }
+  template:
+    metadata:
+      labels:
+        app: mock-inference
+        platform/team: __TEAM__
+    spec:
+      containers:
+        - name: server
+          image: __IMAGE__
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TEAM
+              value: __TEAM__
+            - name: MODEL
+              value: mock-0.5b
+          ports:
+            - name: http
+              containerPort: 8000
+          resources:
+            requests: { cpu: 250m, memory: 256Mi }
+            limits:   { cpu: "1",  memory: 512Mi }
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 3
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mock-inference
+  labels:
+    platform/team: __TEAM__
+spec:
+  selector: { app: mock-inference }
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# platform — golden path CLI.
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+usage() {
+  cat <<TXT
+usage:
+  platform new-team <name> [gpu-quota]   provision an isolated team namespace
+  platform list                          show teams and their GPU quota
+TXT
+  exit 1
+}
+
+case "${1:-}" in
+  new-team)
+    TEAM="${2:?missing team name}"
+    GPU_QUOTA="${3:-4}"
+    echo "Provisioning team '$TEAM' (gpu quota: $GPU_QUOTA)"
+    kubectl create namespace "$TEAM" --dry-run=client -o yaml \
+      | kubectl label --local -f - platform/team="$TEAM" -o yaml \
+      | kubectl apply -f - >/dev/null
+    sed -e "s/__TEAM__/$TEAM/g" -e "s/__GPU_QUOTA__/$GPU_QUOTA/g" \
+      "$ROOT/platform/tenancy/team.yaml.tmpl" | kubectl apply -f -
+    if kubectl get crd localqueues.kueue.x-k8s.io >/dev/null 2>&1; then
+      cat <<YAML | kubectl apply -f -
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: LocalQueue
+metadata:
+  name: default
+  namespace: $TEAM
+spec:
+  clusterQueue: shared-gpu-pool
+YAML
+    fi
+    echo
+    echo "  namespace : $TEAM"
+    echo "  gpu quota : $GPU_QUOTA"
+    echo "  queue     : default -> shared-gpu-pool"
+    echo "  submit    : add label kueue.x-k8s.io/queue-name=default to your Job"
+    ;;
+  list)
+    kubectl get resourcequota -A -o custom-columns=\
+'NAMESPACE:.metadata.namespace,GPU:.spec.hard.requests\.nvidia\.com/gpu' \
+      --no-headers | grep -v '^kube-' || true
+    ;;
+  *) usage ;;
+esac

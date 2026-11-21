@@ -1,0 +1,43 @@
+# --- Job 1: fits comfortably. Admitted immediately. ---------------------------
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: batch-small
+  namespace: team-a
+  labels:
+    kueue.x-k8s.io/queue-name: default
+    kueue.x-k8s.io/priority-class: batch
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: worker
+          image: busybox:1.36
+          command: ["sh", "-c", "echo 'batch-small: 2 GPUs acquired'; sleep 300"]
+          resources:
+            requests: { cpu: "500m", memory: 256Mi, nvidia.com/gpu: "2" }
+            limits:   { nvidia.com/gpu: "2" }
+---
+# --- Job 2: exceeds the remaining quota. Stays PENDING at the queue. ---------
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: batch-huge
+  namespace: team-a
+  labels:
+    kueue.x-k8s.io/queue-name: default
+    kueue.x-k8s.io/priority-class: batch
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: worker
+          image: busybox:1.36
+          command: ["sh", "-c", "echo 'batch-huge: 16 GPUs acquired'; sleep 300"]
+          resources:
+            requests: { cpu: "500m", memory: 256Mi, nvidia.com/gpu: "16" }
+            limits:   { nvidia.com/gpu: "16" }

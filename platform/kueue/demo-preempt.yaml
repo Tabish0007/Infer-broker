@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: batch-a
+  namespace: team-a
+  labels:
+    kueue.x-k8s.io/queue-name: default
+    kueue.x-k8s.io/priority-class: batch
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: w
+          image: busybox:1.36
+          command: ["sh", "-c", "echo batch-a running; sleep 600"]
+          resources:
+            requests: { cpu: 200m, memory: 128Mi, nvidia.com/gpu: "2" }
+            limits:   { nvidia.com/gpu: "2" }
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: batch-b
+  namespace: team-a
+  labels:
+    kueue.x-k8s.io/queue-name: default
+    kueue.x-k8s.io/priority-class: batch
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: w
+          image: busybox:1.36
+          command: ["sh", "-c", "echo batch-b running; sleep 600"]
+          resources:
+            requests: { cpu: 200m, memory: 128Mi, nvidia.com/gpu: "2" }
+            limits:   { nvidia.com/gpu: "2" }
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: interactive
+  namespace: team-a
+  labels:
+    kueue.x-k8s.io/queue-name: default
+    kueue.x-k8s.io/priority-class: interactive
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: w
+          image: busybox:1.36
+          command: ["sh", "-c", "echo interactive running; sleep 600"]
+          resources:
+            requests: { cpu: 200m, memory: 128Mi, nvidia.com/gpu: "4" }
+            limits:   { nvidia.com/gpu: "4" }

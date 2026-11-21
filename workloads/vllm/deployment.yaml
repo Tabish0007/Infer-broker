@@ -1,0 +1,33 @@
+# Production path: swap the mock for vLLM on a real GPU node.
+# Pin the image tag and re-check the current CPU/GPU flags in vLLM's docs —
+# that project changes quickly. The metric names below are what chargeback.py
+# already reads, so no dashboard changes are needed.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm
+  labels: { app: vllm, platform/team: team-a }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: vllm }
+  template:
+    metadata:
+      labels: { app: vllm, platform/team: team-a }
+    spec:
+      nodeSelector:
+        platform/gpu-class: spot
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:v0.8.5   # verify tag
+          args:
+            - "--model=Qwen/Qwen2.5-0.5B-Instruct"
+            - "--max-model-len=2048"
+          ports:
+            - { name: http, containerPort: 8000 }
+          resources:
+            requests: { cpu: "2", memory: 8Gi, nvidia.com/gpu: "1" }
+            limits:   { nvidia.com/gpu: "1" }
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 20

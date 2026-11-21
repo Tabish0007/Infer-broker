@@ -1,0 +1,19 @@
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: ResourceFlavor
+metadata:
+  name: default
+spec: {}
+---
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: WorkloadPriorityClass
+metadata:
+  name: interactive
+value: 1000
+description: "User-facing inference. Preempts batch."
+---
+apiVersion: kueue.x-k8s.io/v1beta1
+kind: WorkloadPriorityClass
+metadata:
+  name: batch
+value: 100
+description: "Backfills, evals, fine-tunes. Preemptible."

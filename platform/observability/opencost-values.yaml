@@ -1,0 +1,16 @@
+opencost:
+  exporter:
+    defaultClusterId: gpu-platform
+    resources:
+      requests: { cpu: 50m, memory: 128Mi }
+  # kind nodes are local containers with no cloud price. Supply explicit values
+  # so the dashboard shows a coherent model rather than nonsense.
+  customPricing:
+    enabled: true
+    provider: custom
+    costModel:
+      description: "Simulated on-prem GPU node"
+      CPU: 0.04
+      RAM: 0.005
+      GPU: 1.00
+      storage: 0.0001

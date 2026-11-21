@@ -1,0 +1,15 @@
+grafana:
+  adminPassword: prom-operator
+  defaultDashboardsEnabled: true
+prometheus:
+  prometheusSpec:
+    retention: 6h
+    resources:
+      requests: { cpu: 100m, memory: 512Mi }
+    # Discover ServiceMonitors/PodMonitors in every namespace, not just those
+    # with the Helm release label. Without this, per-team metrics are invisible.
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+alertmanager:
+  enabled: false
