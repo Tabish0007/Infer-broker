@@ -1,4 +1,8 @@
-# Infer-Broker
+# gpu-broker
+
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Kubernetes](https://img.shields.io/badge/kubernetes-v1.28+-326CE5?logo=kubernetes&logoColor=white)](https://kubernetes.io/)
 
 **Self-service GPU inference on Kubernetes with per-team chargeback.**
 
