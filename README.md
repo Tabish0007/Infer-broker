@@ -23,7 +23,6 @@ Quota alone cannot fix this: a quota is a ceiling, not a share. This replaces th
 | **Serving** | OpenAI-compatible endpoint, scale-to-zero on idle | Idle capacity costs nothing |
 | **Chargeback** | Per-pod allocation -> GPU-hours -> EUR invoice | The part nobody has |
 
-
 ## Results (Executed on `kind`)
 
 | Check | Result |
@@ -36,16 +35,8 @@ Quota alone cannot fix this: a quota is a ceiling, not a share. This replaces th
 
 ### Live Inference Proof
 
-<pre><code>data: {"id":"chatcmpl-d413fc7019e1","object":"chat.completion.chunk","choices":[{"delta":{"content":"This "}}]}
+```json
+data: {"id":"chatcmpl-d413fc7019e1","object":"chat.completion.chunk","choices":[{"delta":{"content":"This "}}]}
 data: {"id":"chatcmpl-d413fc7019e1","object":"chat.completion.chunk","choices":[{"delta":{"content":"is "}}]}
 ...
-data: [DONE]</code></pre>
-
-## Quickstart
-
-```bash
-make up            # kind + Kueue + observability + demo team
-make demo-quota    # admission / refusal
-make port-forward  # localhost:8080
-make invoice TEAM=team-a
-
+data: [DONE]
