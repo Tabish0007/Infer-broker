@@ -22,16 +22,16 @@ Quota alone cannot fix this: a quota is a ceiling, not a share. This replaces th
 | **Admission** | Kueue ClusterQueue + cohorts + WorkloadPriorityClass | Shared pool without starvation |
 | **Serving** | OpenAI-compatible endpoint, scale-to-zero on idle | Idle capacity costs nothing |
 | **Chargeback** | Per-pod allocation -> GPU-hours -> EUR invoice | The part nobody has |
-
 ## Results (Executed on `kind`)
 
 | Check | Result |
 | :--- | :--- |
 | Job requesting 2 GPUs | Admitted, pod Running |
 | Job requesting 16 GPUs (quota = 4) | Refused at admission: `requests must not be above the limitRange max` |
-| Invoice for team-a | **1.000 GPU-hours -> €1.00**, attributed to `team-a` |
+| Invoice for 2 GPUs x 0.05 h | **1.000 GPU-hours -> €1.00**, attributed to `team-a` |
 | Live endpoint | Streaming SSE responses served |
 | Environment check | 7 passed, 0 failed |
+
 ## Quickstart
 
 ```bash
