@@ -28,11 +28,10 @@ Quota alone cannot fix this: a quota is a ceiling, not a share. This replaces th
 | Check | Result |
 | :--- | :--- |
 | Job requesting 2 GPUs | Admitted, pod Running |
-| Job requesting 16 GPUs (quota = 4) | Refused at admission: insufficient quota |
-| Invoice for 2 GPUs x 0.05 h | **0.100 GPU-hours -> 0.10 EUR**, attributed to `team-a` |
+| Job requesting 16 GPUs (quota = 4) | Refused at admission: `requests must not be above the limitRange max` |
+| Invoice for team-a | **1.000 GPU-hours -> €1.00**, attributed to `team-a` |
 | Live endpoint | Streaming SSE responses served |
 | Environment check | 7 passed, 0 failed |
-
 ## Quickstart
 
 ```bash
